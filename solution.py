@@ -1,5 +1,10 @@
 assignments = []
 
+letters = 'ABCDEFGHI'
+numbers = '123456789'
+blocks_rows = ('ABC', 'DEF', 'GHI')
+blocks_nums = ('123', '456', '789')
+
 def assign_value(values, box, value):
     """
     Please use this function to update your values dictionary!
@@ -31,6 +36,30 @@ def cross(A, B):
     keys_arr = [letter + num for letter in A for num in B]
     return keys_arr
 
+def get_siblings(key):
+    siblings = []
+
+    rows = [cross(letter, numbers) for letter in letters]
+    cols = [cross(letters, num) for num in numbers]
+    blocks = [cross(rows, cols) for rows in blocks_rows for cols in blocks_nums]
+
+    for row in rows:
+        if key in row:
+            row.remove(key)
+            siblings = siblings + row
+
+    for col in cols:
+        if key in col:
+            col.remove(key)
+            siblings = siblings + col
+
+    for block in blocks:            
+        if key in block:
+            block.remove(key)
+            siblings = siblings + block
+
+    return siblings
+
 def grid_values(grid):
     """
     Convert grid into a dict of {square: char} with '123456789' for empties.
@@ -41,10 +70,9 @@ def grid_values(grid):
             Keys: The boxes, e.g., 'A1'
             Values: The value in each box, e.g., '8'. If the box has no value, then the value will be '123456789'.
     """
-    empty_value = '123456789'
-    letters = 'ABCDEFGHI'
+    empty_value = numbers
 
-    keys_arr = cross(letters, empty_value)
+    keys_arr = cross(letters, numbers)
     grid_dict = {}
 
     for num in range(0, len(grid)):
@@ -76,7 +104,7 @@ def display(values):
             table = table + '|'
 
         row_item += 1
-        
+
         if row_item <= width:
             table = table + values[key]
         else:
@@ -91,10 +119,17 @@ def display(values):
     print(table)
 
 
-        
-
 def eliminate(values):
-    pass
+    for key, val in values.items():
+        if (len(val) == 1):
+            siblings = get_siblings(key)
+
+            for s_key in siblings:
+                if len(values[s_key]) > 1:
+                    values[s_key] = values[s_key].replace(val, '')
+
+
+    return values
 
 def only_choice(values):
     pass
@@ -106,7 +141,7 @@ def search(values):
     pass
 
 def solve(grid):
-    return grid_values(grid)
+    return eliminate(grid_values(grid))
     """
     Find the solution to a Sudoku grid.
     Args:
