@@ -28,8 +28,8 @@ def naked_twins(values):
     # Eliminate the naked twins as possibilities for their peers
 
 def cross(A, B):
-    "Cross product of elements in A and elements in B."
-    pass
+    keys_arr = [letter + num for letter in A for num in B]
+    return keys_arr
 
 def grid_values(grid):
     """
@@ -41,7 +41,17 @@ def grid_values(grid):
             Keys: The boxes, e.g., 'A1'
             Values: The value in each box, e.g., '8'. If the box has no value, then the value will be '123456789'.
     """
-    pass
+    empty_value = '123456789'
+    letters = 'ABCDEFGHI'
+
+    keys_arr = cross(letters, empty_value)
+    grid_dict = {}
+
+    for num in range(0, len(grid)):
+        grid_dict[keys_arr[num]] = grid[num]
+
+    return grid_dict
+
 
 def display(values):
     """
@@ -64,6 +74,7 @@ def search(values):
     pass
 
 def solve(grid):
+    grid_values(grid)
     """
     Find the solution to a Sudoku grid.
     Args:
