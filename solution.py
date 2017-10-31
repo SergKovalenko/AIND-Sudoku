@@ -48,7 +48,10 @@ def grid_values(grid):
     grid_dict = {}
 
     for num in range(0, len(grid)):
-        grid_dict[keys_arr[num]] = grid[num]
+        if grid[num] != '.':
+            grid_dict[keys_arr[num]] = grid[num]
+        else:
+            grid_dict[keys_arr[num]] = empty_value
 
     return grid_dict
 
@@ -59,7 +62,36 @@ def display(values):
     Args:
         values(dict): The sudoku in dictionary form
     """
-    pass
+
+    width = 9
+    row_item = 0
+    rows = 0
+    table = ''
+
+    for key in sorted(values.keys()):
+        while len(values[key]) < width + 2:
+            values[key] = ' ' + values[key] + ' '
+
+        if row_item == 3 or row_item == 6:
+            table = table + '|'
+
+        row_item += 1
+        
+        if row_item <= width:
+            table = table + values[key]
+        else:
+            row_item = 1
+            table = table + '\n'
+            rows += 1
+            if rows == 3 or rows == 6:
+                table = table + ('-' * width * (width + 2))
+                table = table + '\n'     
+            table = table + values[key]
+
+    print(table)
+
+
+        
 
 def eliminate(values):
     pass
@@ -74,7 +106,7 @@ def search(values):
     pass
 
 def solve(grid):
-    grid_values(grid)
+    return grid_values(grid)
     """
     Find the solution to a Sudoku grid.
     Args:
