@@ -2,7 +2,7 @@ assignments = []
 
 letters = 'ABCDEFGHI'
 numbers = '123456789'
-blocks_rows = ('ABC', 'DEF', 'GHI')
+blocks_lets = ('ABC', 'DEF', 'GHI')
 blocks_nums = ('123', '456', '789')
 
 def assign_value(values, box, value):
@@ -39,13 +39,16 @@ def cross(A, B):
 
 rows = [cross(letter, numbers) for letter in letters]
 cols = [cross(letters, num) for num in numbers]
-blocks = [cross(rows, cols) for rows in blocks_rows for cols in blocks_nums]
+blocks = [cross(lets, nums) for lets in blocks_lets for nums in blocks_nums]
+diags = [[letters[idx] + numbers[idx] for idx, val in enumerate(numbers)],
+         [letters[idx] + numbers[::-1][idx] for idx, val in enumerate(numbers)]]
 
 def get_siblings(key):
     all_s = []
     row_s = []
     col_s = []
     block_s = []
+    diag_s = []
 
     for row in rows:
         if key in row:
@@ -65,9 +68,15 @@ def get_siblings(key):
             block1.remove(key)
             block_s = block1
 
-    all_s = row_s + col_s + block_s
+    for diag in diags:            
+        if key in diag:
+            diag1 = diag[:]
+            diag1.remove(key)
+            diag_s = diag1
 
-    return row_s, col_s, block_s, all_s
+    all_s = row_s + col_s + block_s + diag_s
+
+    return row_s, col_s, block_s, diag_s, all_s
 
 def grid_values(grid):
     """
@@ -131,7 +140,7 @@ def display(values):
 def eliminate(values):
     for key, val in values.items():
         if (len(val) == 1):
-            row, col, block, siblings = get_siblings(key)
+            row, col, block, diag, siblings = get_siblings(key)
 
             for s_key in siblings:
                 if len(values[s_key]) > 1:
@@ -171,13 +180,23 @@ def only_choice(values):
     return values
 
 def reduce_puzzle(values):
-    pass
+    def check_nums(data):
+        counter = 0
+
+        for nums in data:
+            for num in nums:
+                counter += 1
+
+        return counter
+
+    print(check_nums(values))
+
 
 def search(values):
     pass
 
 def solve(grid):
-    return only_choice(eliminate(grid_values(grid)))
+    return eliminate(grid_values(grid))
     """
     Find the solution to a Sudoku grid.
     Args:
@@ -190,6 +209,7 @@ def solve(grid):
 if __name__ == '__main__':
     diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
     display(solve(diag_sudoku_grid))
+    # solve(diag_sudoku_grid)
 
     try:
         from visualize import visualize_assignments
