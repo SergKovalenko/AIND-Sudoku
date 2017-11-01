@@ -36,29 +36,38 @@ def cross(A, B):
     keys_arr = [letter + num for letter in A for num in B]
     return keys_arr
 
-def get_siblings(key):
-    siblings = []
 
-    rows = [cross(letter, numbers) for letter in letters]
-    cols = [cross(letters, num) for num in numbers]
-    blocks = [cross(rows, cols) for rows in blocks_rows for cols in blocks_nums]
+rows = [cross(letter, numbers) for letter in letters]
+cols = [cross(letters, num) for num in numbers]
+blocks = [cross(rows, cols) for rows in blocks_rows for cols in blocks_nums]
+
+def get_siblings(key):
+    all_s = []
+    row_s = []
+    col_s = []
+    block_s = []
 
     for row in rows:
         if key in row:
-            row.remove(key)
-            siblings = siblings + row
+            row1 = row[:]
+            row1.remove(key)
+            row_s = row1
 
     for col in cols:
         if key in col:
-            col.remove(key)
-            siblings = siblings + col
+            col1 = col[:]
+            col1.remove(key)
+            col_s = col1
 
     for block in blocks:            
         if key in block:
-            block.remove(key)
-            siblings = siblings + block
+            block1 = block[:]
+            block1.remove(key)
+            block_s = block1
 
-    return siblings
+    all_s = row_s + col_s + block_s
+
+    return row_s, col_s, block_s, all_s
 
 def grid_values(grid):
     """
@@ -122,7 +131,7 @@ def display(values):
 def eliminate(values):
     for key, val in values.items():
         if (len(val) == 1):
-            siblings = get_siblings(key)
+            row, col, block, siblings = get_siblings(key)
 
             for s_key in siblings:
                 if len(values[s_key]) > 1:
@@ -132,7 +141,34 @@ def eliminate(values):
     return values
 
 def only_choice(values):
-    pass
+    for key, val in values.items():
+        if len(val) == 1:
+            continue
+
+        
+        row, col, block, all_s = get_siblings(key)
+
+        def only(keys):
+            num_dict = { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0, '6': 0, '7': 0, '8': 0, '9': 0 }
+
+            for num1 in val:
+                num_dict[num1] += 1
+            for key1 in keys:
+                if len(values[key1]) == 1:
+                    continue
+                for num2 in values[key1]:
+                    num_dict[num2] +=1
+
+            for num in num_dict:
+                if num == 1 and num in val:
+                    values[key] = num
+            # print(key, num_dict)
+
+        only(row)
+        only(col)
+        only(block)
+
+    return values
 
 def reduce_puzzle(values):
     pass
@@ -141,7 +177,7 @@ def search(values):
     pass
 
 def solve(grid):
-    return eliminate(grid_values(grid))
+    return only_choice(eliminate(grid_values(grid)))
     """
     Find the solution to a Sudoku grid.
     Args:
