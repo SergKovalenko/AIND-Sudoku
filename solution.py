@@ -20,6 +20,16 @@ def assign_value(values, box, value):
         assignments.append(values.copy())
     return values
 
+def cross(A, B):
+    keys_arr = [letter + num for letter in A for num in B]
+    return keys_arr
+
+rows = [cross(letter, numbers) for letter in letters]
+cols = [cross(letters, num) for num in numbers]
+blocks = [cross(lets, nums) for lets in blocks_lets for nums in blocks_nums]
+diags = [[letters[idx] + numbers[idx] for idx, val in enumerate(numbers)],
+         [letters[idx] + numbers[::-1][idx] for idx, val in enumerate(numbers)]]
+
 def naked_twins(values):
     """Eliminate values using the naked twins strategy.
     Args:
@@ -29,19 +39,26 @@ def naked_twins(values):
         the values dictionary with the naked twins eliminated from peers.
     """
 
+    for key, val in values.items():
+        if (len(val) == 2):
+            row, col, block, diag, siblings = get_siblings(key)
+
+            def find_twin_in(keys):
+                twin = False
+
+                for key1 in keys:
+                    if values[key] == val:
+                        twin = True
+                if twin:
+                    for key2 in keys:
+                        for num in val:
+                            values[key2] = values[key2].replace(num, '')
+
+
+    return values
+
     # Find all instances of naked twins
     # Eliminate the naked twins as possibilities for their peers
-
-def cross(A, B):
-    keys_arr = [letter + num for letter in A for num in B]
-    return keys_arr
-
-
-rows = [cross(letter, numbers) for letter in letters]
-cols = [cross(letters, num) for num in numbers]
-blocks = [cross(lets, nums) for lets in blocks_lets for nums in blocks_nums]
-diags = [[letters[idx] + numbers[idx] for idx, val in enumerate(numbers)],
-         [letters[idx] + numbers[::-1][idx] for idx, val in enumerate(numbers)]]
 
 def get_siblings(key):
     all_s = []
