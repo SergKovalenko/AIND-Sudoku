@@ -115,15 +115,16 @@ def display(values):
     Args:
         values(dict): The sudoku in dictionary form
     """
+    display_values = values.copy()
 
     width = 9
     row_item = 0
     rows = 0
     table = ''
 
-    for key in sorted(values.keys()):
-        while len(values[key]) < width + 2:
-            values[key] = ' ' + values[key] + ' '
+    for key in sorted(display_values.keys()):
+        while len(display_values[key]) < width + 2:
+            display_values[key] = ' ' + display_values[key] + ' '
 
         if row_item == 3 or row_item == 6:
             table = table + '|'
@@ -131,7 +132,7 @@ def display(values):
         row_item += 1
 
         if row_item <= width:
-            table = table + values[key]
+            table = table + display_values[key]
         else:
             row_item = 1
             table = table + '\n'
@@ -139,17 +140,15 @@ def display(values):
             if rows == 3 or rows == 6:
                 table = table + ('-' * width * (width + 2))
                 table = table + '\n'     
-            table = table + values[key]
+            table = table + display_values[key]
 
     print(table)
 
 
-def eliminate(values):
+def eliminate(values, iteration):
     for key, val in values.items():
         if (len(val) == 1):
             row, col, block, diag, siblings = get_siblings(key)
-            # if key == 'E5':
-            #     print(diag)
             for s_key in siblings:
                 if len(values[s_key]) > 1:
                     values[s_key] = values[s_key].replace(val, '')
@@ -157,7 +156,7 @@ def eliminate(values):
 
     return values
 
-def only_choice(values):
+def only_choice(values, iteration):
     for key, val in values.items():
         if len(val) == 1:
             continue
@@ -165,7 +164,7 @@ def only_choice(values):
         
         row, col, block, diag, all_s = get_siblings(key)
 
-        def only(keys):
+        def only(keys, type):
             if len(keys) == 0:
                 return
 
@@ -174,41 +173,45 @@ def only_choice(values):
             for num1 in val:
                 num_dict[num1] += 1
             for key1 in keys:
-                if len(values[key1]) == 1:
-                    continue
+                # if len(values[key1]) == 1:
+                    # continue
                 for num2 in values[key1]:
                     num_dict[num2] +=1
-
+            if(key == 'I2'):
+                print(type, num_dict)
             for num, count in num_dict.items():
                 if count == 1 and num in val:
                     values[key] = num
 
-        only(row)
-        only(col)
-        only(block)
-        only(diag)
-
+        only(row, 'row')
+        only(col, 'col')
+        only(block, 'block')
+        only(diag, 'diag')
     return values
 
 def reduce_puzzle(values):
     def check_nums(data):
         counter = 0
 
-        for nums in data:
+        for key, nums in data.items():
             counter += len(nums)
 
         return counter
-
-    old_value = check_nums(grid_values(values))
+    values = grid_values(values)
+    old_value = check_nums(values)
     new_value = old_value - 1
-
+    iteration = 0
     while new_value < old_value:
-        print('reduce')
+        iteration += 1
+        # print('iteration', iteration)
         old_value = new_value
-        print('old', old_value)
-        values = only_choice(eliminate(grid_values(values)))
+        values = eliminate(values, iteration)
+        # print('eliminate')
+        # display(values)
+        values = only_choice(values, iteration)
         new_value = check_nums(values)
-        print('new', new_value)
+        # print('only_choice')
+        # display(values)
 
     return values
 
