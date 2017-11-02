@@ -74,6 +74,13 @@ def get_siblings(key):
             diag1.remove(key)
             diag_s = diag1
 
+    if key == 'E5':
+        diag_s = []
+        for diag in diags:
+            for item in diag:
+                if (item != 'E5'):
+                    diag_s.append(item)
+
     all_s = row_s + col_s + block_s + diag_s
 
     return row_s, col_s, block_s, diag_s, all_s
@@ -141,7 +148,8 @@ def eliminate(values):
     for key, val in values.items():
         if (len(val) == 1):
             row, col, block, diag, siblings = get_siblings(key)
-
+            # if key == 'E5':
+            #     print(diag)
             for s_key in siblings:
                 if len(values[s_key]) > 1:
                     values[s_key] = values[s_key].replace(val, '')
@@ -155,9 +163,12 @@ def only_choice(values):
             continue
 
         
-        row, col, block, all_s = get_siblings(key)
+        row, col, block, diag, all_s = get_siblings(key)
 
         def only(keys):
+            if len(keys) == 0:
+                return
+
             num_dict = { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0, '6': 0, '7': 0, '8': 0, '9': 0 }
 
             for num1 in val:
@@ -168,14 +179,14 @@ def only_choice(values):
                 for num2 in values[key1]:
                     num_dict[num2] +=1
 
-            for num in num_dict:
-                if num == 1 and num in val:
+            for num, count in num_dict.items():
+                if count == 1 and num in val:
                     values[key] = num
-            # print(key, num_dict)
 
         only(row)
         only(col)
         only(block)
+        only(diag)
 
     return values
 
@@ -184,19 +195,29 @@ def reduce_puzzle(values):
         counter = 0
 
         for nums in data:
-            for num in nums:
-                counter += 1
+            counter += len(nums)
 
         return counter
 
-    print(check_nums(values))
+    old_value = check_nums(grid_values(values))
+    new_value = old_value - 1
+
+    while new_value < old_value:
+        print('reduce')
+        old_value = new_value
+        print('old', old_value)
+        values = only_choice(eliminate(grid_values(values)))
+        new_value = check_nums(values)
+        print('new', new_value)
+
+    return values
 
 
 def search(values):
     pass
 
 def solve(grid):
-    return eliminate(grid_values(grid))
+    return reduce_puzzle(grid)
     """
     Find the solution to a Sudoku grid.
     Args:
