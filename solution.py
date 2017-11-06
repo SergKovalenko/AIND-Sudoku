@@ -38,7 +38,6 @@ def naked_twins(values):
     Returns:
         the values dictionary with the naked twins eliminated from peers.
     """
-
     for key, val in values.items():
         if (len(val) == 2):
             row, col, block, diag, siblings = get_siblings(key)
@@ -47,13 +46,18 @@ def naked_twins(values):
                 twin = False
 
                 for key1 in keys:
-                    if values[key] == val:
+                    if values[key1] == val:
                         twin = True
                 if twin:
                     for key2 in keys:
-                        for num in val:
-                            values[key2] = values[key2].replace(num, '')
+                        if (len(values[key2]) > 2):
+                            for num in val:
+                                values[key2] = values[key2].replace(num, '')
 
+            find_twin_in(row)
+            find_twin_in(col)
+            find_twin_in(block)
+            find_twin_in(diag)
 
     return values
 
@@ -194,8 +198,8 @@ def only_choice(values, iteration):
                     # continue
                 for num2 in values[key1]:
                     num_dict[num2] +=1
-            if(key == 'I2'):
-                print(type, num_dict)
+            # if(key == 'I2'):
+            #     print(type, num_dict)
             for num, count in num_dict.items():
                 if count == 1 and num in val:
                     values[key] = num
