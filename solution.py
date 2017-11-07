@@ -57,7 +57,8 @@ def naked_twins(values):
             find_twin_in(row)
             find_twin_in(col)
             find_twin_in(block)
-            find_twin_in(diag)
+            #ToDo
+            # find_twin_in(diag)
 
     return values
 
@@ -103,7 +104,8 @@ def get_siblings(key):
                     diag_s.append(item)
 
     all_s = row_s + col_s + block_s + diag_s
-
+    #ToDo
+    all_s = row_s + col_s + block_s
     return row_s, col_s, block_s, diag_s, all_s
 
 def grid_values(grid):
@@ -194,20 +196,18 @@ def only_choice(values, iteration):
             for num1 in val:
                 num_dict[num1] += 1
             for key1 in keys:
-                # if len(values[key1]) == 1:
-                    # continue
                 for num2 in values[key1]:
                     num_dict[num2] +=1
-            # if(key == 'I2'):
-            #     print(type, num_dict)
             for num, count in num_dict.items():
                 if count == 1 and num in val:
-                    values[key] = num
+                    # values[key] = num
+                    assign_value(values, key, num)
 
         only(row, 'row')
         only(col, 'col')
         only(block, 'block')
-        only(diag, 'diag')
+        #ToDo
+        # only(diag, 'diag')
     return values
 
 def reduce_puzzle(values):
@@ -218,30 +218,73 @@ def reduce_puzzle(values):
             counter += len(nums)
 
         return counter
-    values = grid_values(values)
+    #ToDo
+    # values = grid_values(values)
     old_value = check_nums(values)
     new_value = old_value - 1
     iteration = 0
     while new_value < old_value:
+
+        # print('next')
+        # display(values)
         iteration += 1
-        # print('iteration', iteration)
         old_value = new_value
         values = eliminate(values, iteration)
-        # print('eliminate')
-        # display(values)
+
         values = only_choice(values, iteration)
+        values = naked_twins(values)
         new_value = check_nums(values)
-        # print('only_choice')
-        # display(values)
+
+        for key, val in values.items():
+            if (len(val) == 0):
+                return False
 
     return values
 
 
 def search(values):
-    pass
+    values = {
+        'D9': '123456789', 'G5': '123456789', 'B8': '123456789', 'C1': '123456789',
+        'H5': '123456789', 'C9': '123456789', 'I8': '123456789', 'H6': '123456789',
+        'I9': '123456789', 'D6': '123456789', 'F7': '123456789', 'I7': '123456789',
+        'B3': '123456789', 'B6': '123456789', 'B9': '123456789', 'C5': '123456789',
+        'I5': '123456789', 'E2': '123456789', 'B7': '123456789', 'B1': '123456789',
+        'A5': '123456789', 'G4': '6', 'A4': '123456789', 'C7': '123456789', 'A8': '123456789',
+        'E7': '4', 'F9': '123456789', 'A7': '8', 'E8': '123456789', 'F5': '1', 'E3': '123456789',
+        'F4': '123456789', 'H4': '2', 'G8': '7', 'D3': '123456789', 'G1': '123456789',
+        'I2': '123456789', 'D2': '2', 'A1': '4', 'F3': '123456789', 'F2': '123456789', 'G9': '123456789',
+        'E4': '123456789', 'H7': '123456789', 'E9': '123456789', 'I4': '123456789', 'B4': '123456789',
+        'G3': '123456789', 'D7': '123456789', 'A9': '5', 'C8': '123456789', 'F6': '123456789', 'F8': '123456789',
+        'E1': '123456789', 'A6': '123456789', 'G2': '123456789', 'I1': '1', 'G7': '123456789', 'G6': '3',
+        'A2': '123456789', 'A3': '123456789', 'H1': '5', 'C2': '123456789', 'D1': '123456789',
+        'C4': '7', 'H8': '123456789', 'H9': '123456789', 'H3': '123456789', 'D5': '123456789',
+        'B2': '3', 'E6': '123456789', 'E5': '8', 'I3': '4', 'F1': '123456789', 'D4': '123456789',
+        'B5': '123456789', 'H2': '123456789', 'D8': '6', 'C3': '123456789', 'I6': '123456789', 'C6': '123456789'
+    }
+
+    # row, col, block, diag, all_s = get_siblings(key)
+
+    values = reduce_puzzle(values)
+    # if values is False:
+    #     return False ## Failed earlier
+    if all(len(values[s]) == 1 for s in boxes): 
+        return values ## Solved!
+    # Choose one of the unfilled squares with the fewest possibilities
+    sorted_values = []
+
+    for key, val in values:
+
+    n,s = min((len(values[s]), s) for s in boxes if len(values[s]) > 1)
+    # Now use recurrence to solve each one of the resulting sudokus, and 
+    for value in values[s]:
+        attempt_values = values.copy()
+        attempt_values[s] = value
+        new_values = search(attempt_values)
+        if new_values:
+            return new_values
 
 def solve(grid):
-    return reduce_puzzle(grid)
+    return search(grid)
     """
     Find the solution to a Sudoku grid.
     Args:
@@ -254,7 +297,7 @@ def solve(grid):
 if __name__ == '__main__':
     diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
     display(solve(diag_sudoku_grid))
-    # solve(diag_sudoku_grid)
+    # reduce_puzzle(diag_sudoku_grid)
 
     try:
         from visualize import visualize_assignments
