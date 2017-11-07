@@ -173,8 +173,8 @@ def eliminate(values, iteration):
         if (len(val) == 1):
             row, col, block, diag, siblings = get_siblings(key)
             for s_key in siblings:
-                if len(values[s_key]) > 1:
-                    values[s_key] = values[s_key].replace(val, '')
+                # if len(values[s_key]) > 1:
+                values[s_key] = values[s_key].replace(val, '')
 
 
     return values
@@ -231,19 +231,63 @@ def reduce_puzzle(values):
         old_value = new_value
         values = eliminate(values, iteration)
 
-        values = only_choice(values, iteration)
-        values = naked_twins(values)
+        # values = only_choice(values, iteration)
+        # values = naked_twins(values)
         new_value = check_nums(values)
 
         for key, val in values.items():
             if (len(val) == 0):
+                print('FAAAAAALSeeeeee')
                 return False
 
     return values
 
 
 def search(values):
-    values = {
+    values = reduce_puzzle(values)
+
+    if values is False:
+        return False ## Failed earlier
+    if all(len(values[key]) == 1 for key in values): 
+        return values ## Solved!
+
+    sorted_keys = []
+    len_of_values = { 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: [] }
+
+
+    for key, val in values.items():
+        if len(val) > 1:
+            len_of_values[len(val)].append(key)
+
+    print(len_of_values)
+
+    for key in sorted(len_of_values.keys()):
+        sorted_keys = sorted_keys + len_of_values[key]
+
+    for key in sorted_keys:
+        for num in values[key]:
+            print(num, key)
+            attempt_values = values.copy()
+            attempt_values[key] = num
+            display(attempt_values)
+            new_values = search(attempt_values)
+            if new_values:
+                return new_values
+
+def solve(grid):
+    return search(grid)
+    """
+    Find the solution to a Sudoku grid.
+    Args:
+        grid(string): a string representing a sudoku grid.
+            Example: '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
+    Returns:
+        The dictionary representation of the final sudoku grid. False if no solution exists.
+    """
+
+if __name__ == '__main__':
+    # diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
+    diag_sudoku_grid = {
         'D9': '123456789', 'G5': '123456789', 'B8': '123456789', 'C1': '123456789',
         'H5': '123456789', 'C9': '123456789', 'I8': '123456789', 'H6': '123456789',
         'I9': '123456789', 'D6': '123456789', 'F7': '123456789', 'I7': '123456789',
@@ -261,43 +305,8 @@ def search(values):
         'B2': '3', 'E6': '123456789', 'E5': '8', 'I3': '4', 'F1': '123456789', 'D4': '123456789',
         'B5': '123456789', 'H2': '123456789', 'D8': '6', 'C3': '123456789', 'I6': '123456789', 'C6': '123456789'
     }
-
-    # row, col, block, diag, all_s = get_siblings(key)
-
-    values = reduce_puzzle(values)
-    # if values is False:
-    #     return False ## Failed earlier
-    if all(len(values[s]) == 1 for s in boxes): 
-        return values ## Solved!
-    # Choose one of the unfilled squares with the fewest possibilities
-    sorted_values = []
-
-    for key, val in values:
-
-    n,s = min((len(values[s]), s) for s in boxes if len(values[s]) > 1)
-    # Now use recurrence to solve each one of the resulting sudokus, and 
-    for value in values[s]:
-        attempt_values = values.copy()
-        attempt_values[s] = value
-        new_values = search(attempt_values)
-        if new_values:
-            return new_values
-
-def solve(grid):
-    return search(grid)
-    """
-    Find the solution to a Sudoku grid.
-    Args:
-        grid(string): a string representing a sudoku grid.
-            Example: '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
-    Returns:
-        The dictionary representation of the final sudoku grid. False if no solution exists.
-    """
-
-if __name__ == '__main__':
-    diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
     display(solve(diag_sudoku_grid))
-    # reduce_puzzle(diag_sudoku_grid)
+    # search(diag_sudoku_grid)
 
     try:
         from visualize import visualize_assignments
