@@ -57,8 +57,7 @@ def naked_twins(values):
             find_twin_in(row)
             find_twin_in(col)
             find_twin_in(block)
-            #ToDo
-            # find_twin_in(diag)
+            find_twin_in(diag)
 
     return values
 
@@ -105,7 +104,8 @@ def get_siblings(key):
 
     all_s = row_s + col_s + block_s + diag_s
     #ToDo
-    all_s = row_s + col_s + block_s
+    # all_s = row_s + col_s + block_s
+
     return row_s, col_s, block_s, diag_s, all_s
 
 def grid_values(grid):
@@ -168,23 +168,21 @@ def display(values):
     print(table)
 
 
-def eliminate(values, iteration):
+def eliminate(values):
     for key, val in values.items():
+
         if (len(val) == 1):
             row, col, block, diag, siblings = get_siblings(key)
-            for s_key in siblings:
-                # if len(values[s_key]) > 1:
-                values[s_key] = values[s_key].replace(val, '')
 
+            for s_key in siblings:
+                values[s_key] = values[s_key].replace(val, '')
 
     return values
 
-def only_choice(values, iteration):
+def only_choice(values):
     for key, val in values.items():
         if len(val) == 1:
             continue
-
-        
         row, col, block, diag, all_s = get_siblings(key)
 
         def only(keys, type):
@@ -200,14 +198,13 @@ def only_choice(values, iteration):
                     num_dict[num2] +=1
             for num, count in num_dict.items():
                 if count == 1 and num in val:
-                    # values[key] = num
                     assign_value(values, key, num)
 
         only(row, 'row')
         only(col, 'col')
         only(block, 'block')
-        #ToDo
-        # only(diag, 'diag')
+        only(diag, 'diag')
+
     return values
 
 def reduce_puzzle(values):
@@ -218,21 +215,16 @@ def reduce_puzzle(values):
             counter += len(nums)
 
         return counter
-    #ToDo
-    # values = grid_values(values)
+
     old_value = check_nums(values)
     new_value = old_value - 1
     iteration = 0
     while new_value < old_value:
-
-        # print('next')
-        # display(values)
         iteration += 1
         old_value = new_value
-        values = eliminate(values, iteration)
-
-        # values = only_choice(values, iteration)
-        # values = naked_twins(values)
+        values = eliminate(values)
+        values = only_choice(values)
+        values = naked_twins(values)
         new_value = check_nums(values)
 
         for key, val in values.items():
@@ -242,14 +234,13 @@ def reduce_puzzle(values):
 
     return values
 
-
 def search(values):
     values = reduce_puzzle(values)
 
-    if values is False:
-        return False ## Failed earlier
+    if not values:
+        return False
     if all(len(values[key]) == 1 for key in values): 
-        return values ## Solved!
+        return values
 
     sorted_keys = []
     len_of_values = { 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: [] }
@@ -259,23 +250,21 @@ def search(values):
         if len(val) > 1:
             len_of_values[len(val)].append(key)
 
-    print(len_of_values)
-
     for key in sorted(len_of_values.keys()):
         sorted_keys = sorted_keys + len_of_values[key]
 
     for key in sorted_keys:
         for num in values[key]:
-            print(num, key)
             attempt_values = values.copy()
             attempt_values[key] = num
-            display(attempt_values)
+
             new_values = search(attempt_values)
             if new_values:
                 return new_values
 
+
 def solve(grid):
-    return search(grid)
+    return search(grid_values(grid))
     """
     Find the solution to a Sudoku grid.
     Args:
@@ -286,27 +275,11 @@ def solve(grid):
     """
 
 if __name__ == '__main__':
-    # diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
-    diag_sudoku_grid = {
-        'D9': '123456789', 'G5': '123456789', 'B8': '123456789', 'C1': '123456789',
-        'H5': '123456789', 'C9': '123456789', 'I8': '123456789', 'H6': '123456789',
-        'I9': '123456789', 'D6': '123456789', 'F7': '123456789', 'I7': '123456789',
-        'B3': '123456789', 'B6': '123456789', 'B9': '123456789', 'C5': '123456789',
-        'I5': '123456789', 'E2': '123456789', 'B7': '123456789', 'B1': '123456789',
-        'A5': '123456789', 'G4': '6', 'A4': '123456789', 'C7': '123456789', 'A8': '123456789',
-        'E7': '4', 'F9': '123456789', 'A7': '8', 'E8': '123456789', 'F5': '1', 'E3': '123456789',
-        'F4': '123456789', 'H4': '2', 'G8': '7', 'D3': '123456789', 'G1': '123456789',
-        'I2': '123456789', 'D2': '2', 'A1': '4', 'F3': '123456789', 'F2': '123456789', 'G9': '123456789',
-        'E4': '123456789', 'H7': '123456789', 'E9': '123456789', 'I4': '123456789', 'B4': '123456789',
-        'G3': '123456789', 'D7': '123456789', 'A9': '5', 'C8': '123456789', 'F6': '123456789', 'F8': '123456789',
-        'E1': '123456789', 'A6': '123456789', 'G2': '123456789', 'I1': '1', 'G7': '123456789', 'G6': '3',
-        'A2': '123456789', 'A3': '123456789', 'H1': '5', 'C2': '123456789', 'D1': '123456789',
-        'C4': '7', 'H8': '123456789', 'H9': '123456789', 'H3': '123456789', 'D5': '123456789',
-        'B2': '3', 'E6': '123456789', 'E5': '8', 'I3': '4', 'F1': '123456789', 'D4': '123456789',
-        'B5': '123456789', 'H2': '123456789', 'D8': '6', 'C3': '123456789', 'I6': '123456789', 'C6': '123456789'
-    }
+    diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
+    # diag_sudoku_grid = '4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......'
+
     display(solve(diag_sudoku_grid))
-    # search(diag_sudoku_grid)
+    # solve(diag_sudoku_grid)
 
     try:
         from visualize import visualize_assignments
