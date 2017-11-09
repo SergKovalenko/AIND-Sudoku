@@ -208,6 +208,7 @@ def only_choice(values):
     return values
 
 def reduce_puzzle(values):
+    # display(values)
     def check_nums(data):
         counter = 0
 
@@ -220,13 +221,16 @@ def reduce_puzzle(values):
     new_value = old_value - 1
     iteration = 0
     while new_value < old_value:
+        # print('before')
+        # display(values)
         iteration += 1
         old_value = new_value
         values = eliminate(values)
         values = only_choice(values)
         values = naked_twins(values)
         new_value = check_nums(values)
-
+        # print('after')
+        # display(values)
         for key, val in values.items():
             if (len(val) == 0):
                 print('FAAAAAALSeeeeee')
@@ -245,7 +249,6 @@ def search(values):
     sorted_keys = []
     len_of_values = { 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: [] }
 
-
     for key, val in values.items():
         if len(val) > 1:
             len_of_values[len(val)].append(key)
@@ -253,14 +256,16 @@ def search(values):
     for key in sorted(len_of_values.keys()):
         sorted_keys = sorted_keys + len_of_values[key]
 
-    for key in sorted_keys:
-        for num in values[key]:
-            attempt_values = values.copy()
-            attempt_values[key] = num
+    for num in values[sorted_keys[0]]:
+        attempt_values = values.copy()
+        attempt_values[sorted_keys[0]] = num
 
-            new_values = search(attempt_values)
-            if new_values:
-                return new_values
+        new_values = search(attempt_values)
+        if new_values:
+            return new_values
+
+
+
 
 
 def solve(grid):
@@ -275,10 +280,31 @@ def solve(grid):
     """
 
 if __name__ == '__main__':
-    diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
+    # diag_sudoku_grid = '9.1....8.8.5.7..4.2.4....6...7......5..............83.3..6......9................'
+    diag_sudoku_grid = '......8.68.........7..863.....8............8..8.5.9...1.8..............8.....8.4.' #naked twins test
+    # diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
     # diag_sudoku_grid = '4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......'
 
-    display(solve(diag_sudoku_grid))
+    {"D9": "47", "E4": "2", "I2": "2345678", "C2": "1234568", "B9":
+    "124578", "F4": "9", "D6": "5", "C6": "236789", "G9": "24578", "D2":
+    "9", "E9": "3", "E1": "567", "B4": "345678", "I7": "1", "I1":
+    "2345678", "C3": "1234569", "F8": "58", "A5": "1", "A7": "234568",
+    "G6": "1236789", "E2": "567", "E8": "1", "A3": "7", "B1": "2345689",
+    "G5": "23456789", "D8": "2", "I4": "345678", "C9": "124578", "H8":
+    "345678", "F7": "58", "F6": "37", "G4": "345678", "F9": "6", "H3":
+    "1234569", "A4": "34568", "A8": "345689", "B2": "1234568", "D5": "36",
+    "D7": "47", "H4": "345678", "B7": "2345678", "H5": "23456789", "G1":
+    "23456789", "G8": "345678", "A6": "23689", "F3": "24", "A2": "234568",
+    "E6": "4", "I3": "23456", "C4": "345678", "A1": "2345689", "H1":
+    "23456789", "B5": "23456789", "G7": "2345678", "G3": "1234569", "B8":
+    "3456789", "F5": "37", "C1": "2345689", "C8": "3456789", "C7":
+    "2345678", "E7": "9", "H9": "24578", "I8": "345678", "D3": "8", "F1":
+    "1", "A9": "2458", "H6": "1236789", "I9": "9", "C5": "23456789", "G2":
+    "12345678", "D1": "36", "I5": "2345678", "D4": "1", "F2": "24", "E3":
+    "56", "I6": "23678", "H2": "12345678", "B6": "236789", "H7":
+    "2345678", "E5": "678", "B3": "1234569"}
+
+    # display(solve(diag_sudoku_grid))
     # solve(diag_sudoku_grid)
 
     try:
