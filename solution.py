@@ -71,7 +71,13 @@ def naked_twins(values):
     return values
 
 def get_siblings(key):
-    # function to find all siblings types of current key
+    """find all siblings types of current key.
+    Args:
+        values(strng): string of key value 'A1, A2, B1, B2...'
+
+    Returns:
+        the values dictionary with the naked twins eliminated from peers.
+    """
     all_s = []
     row_s = []
     col_s = []
@@ -178,6 +184,11 @@ def display(values):
 
 
 def eliminate(values):
+    """
+    Eliminate all values that definitely can't be used to solve puzzle
+    Args:
+        values(dict): The sudoku in dictionary form
+    """
     for key, val in values.items():
 
         if (len(val) == 1):
@@ -190,6 +201,11 @@ def eliminate(values):
 
 
 def only_choice(values):
+    """
+    Assighn value to key, if this value is unique among all siblings type
+    Args:
+        values(dict): The sudoku in dictionary form
+    """
     for key, val in values.items():
         if len(val) == 1:
             continue
@@ -224,6 +240,11 @@ def only_choice(values):
 
 
 def reduce_puzzle(values):
+    """
+    Use 'eliminate' and 'only_choice' function in cycles, till they can reduce puzzle
+    Args:
+        values(dict): The sudoku in dictionary form
+    """
     def check_nums(data):
         counter = 0
 
@@ -232,7 +253,9 @@ def reduce_puzzle(values):
 
         return counter
 
+    #number of nums in sudoku before current step of reduction
     old_value = check_nums(values)
+    #number of nums in sudoku after current step of puzzle reduction (set -1 to old value, just to do first reduction iteration)
     new_value = old_value - 1
 
     while new_value < old_value:
@@ -250,6 +273,11 @@ def reduce_puzzle(values):
 
 
 def search(values):
+    """
+    Try different nums of not reduced values and check can we solve puzzle with selected num.
+    Args:
+        values(dict): The sudoku in dictionary form
+    """
     values = reduce_puzzle(values)
 
     if not values:
@@ -278,7 +306,6 @@ def search(values):
 
 
 def solve(grid):
-    return search(grid_values(grid))
     """
     Find the solution to a Sudoku grid.
     Args:
@@ -287,6 +314,8 @@ def solve(grid):
     Returns:
         The dictionary representation of the final sudoku grid. False if no solution exists.
     """
+    return search(grid_values(grid))
+
 
 if __name__ == '__main__':
     # diag_sudoku_grid = '9.1....8.8.5.7..4.2.4....6...7......5..............83.3..6......9................'

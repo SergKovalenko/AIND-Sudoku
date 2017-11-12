@@ -3,11 +3,14 @@
 
 # Question 1 (Naked Twins)
 Q: How do we use constraint propagation to solve the naked twins problem?  
-A: *Student should provide answer here*
+A: Find all two-number sudoku cell, iterate over different siblings type of each of them and check is it "twin" of this number. 
+	If yes - remove numbers of this twins from all other siblings of this type (col, row, square box)
+	
 
 # Question 2 (Diagonal Sudoku)
 Q: How do we use constraint propagation to solve the diagonal sudoku problem?  
-A: *Student should provide answer here*
+A: We should find a single-number sudoku cell, then remove this number from all its siblings (square block, row, column, diagonal).
+	So, diagonal sudoku solved in the same way as normal sudoku, but we should also count diagonal siblings. The only difference is that not every value has diagonal siblings, and only the middle value has siblings in both diagonals. Then use Only Choice to find unique value in square block, row, column, and diagonal. And again just as normal sudoku but counting dialognal siblings. Repeat all previous steps till we can reduce sudoku.
 
 ### Install
 
